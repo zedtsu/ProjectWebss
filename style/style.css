@@ -23,3 +23,123 @@ h1 {
     margin-bottom: 20px;
     color: rgb(255, 255, 255);
 }
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bpm-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.play-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.stop-button {
+    background-color: #f44336;
+    color: white;
+}
+
+#clear {
+    background-color: #ff9800;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.drum-pads {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.drum-pad {
+    width: 80px;
+    height: 80px;
+    background-color: rgb(50, 50, 80);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    user-select: none;
+}
+
+.drum-pad:hover {
+    background-color: rgb(70, 70, 110);
+}
+
+.drum-pad.active {
+    background-color: rgb(100, 150, 255);
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sequencer {
+    margin-top: 20px;
+}
+
+.track {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.track-name {
+    width: 80px;
+    text-align: center;
+}
+
+.steps {
+    display: flex;
+    flex-grow: 1;
+    gap: 5px;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    background-color: rgb(50, 50, 80);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.step:hover {
+        background-color: rgb(70, 70, 110);
+}
+
+.step.active {
+    background-color: rgb(100, 150, 255);
+}
+
+.step.current {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}

@@ -4,23 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="style/style.css" type="text/css" rel="stylesheet"/>
-    <script src="js/script.js" type="text/javascript"></script>
+    <link rel="shortcut icon" href="data/icon.png" type="image">
     <title>Drumpad online</title>
 </head>
 <body>
     <div class="drum-machine">
         <h1>Drumpad online</h1>
         <div class="controls">
-            <div class="bpm-control">
-                <label for="bpm">BPM:</label>
-                <input type="range" id="bpm" min="60" max="180" value="130">
-                <span id="bpmValue">130</span>
+            <div class="control-row">
+                <div class="bpm-control">
+                    <label for="bpm">BPM:</label>
+                    <input type="range" id="bpm" min="60" max="180" value="130">
+                    <span id="bpmValue">130</span>
+                </div>
+                <div class="buttons">
+                    <button class="play-button" id="play">Играть</button>
+                    <button class="stop-button" id="stop">Остановить</button>
+                    <button id="clear">Очистить</button>
+                </div>
             </div>
-
-            <button class="play-button" id="play">Играть</button>
-            <button class="stop-button" id="stop">Остановить</button>
-            <button id="clear">Очистить</button>
+        </div>
+        
+        <div class="drum-pads">
+            <div class="drum-pad" data-sound="kick">Kick</div>
+            <div class="drum-pad" data-sound="snare">Snare</div>
+            <div class="drum-pad" data-sound="hihat">Hi-Hat</div>
+            <div class="drum-pad" data-sound="clap">Clap</div>
+        </div>
+        
+        <div class="sequencer">
+            <div class="track">
+                <div class="track-name">Kick</div>
+                <div class="steps" data-track="kick">
+                </div>
+            </div>
+            <div class="track">
+                <div class="track-name">Snare</div>
+                <div class="steps" data-track="snare">
+                </div>
+            </div>
+            <div class="track">
+                <div class="track-name">Hi-Hat</div>
+                <div class="steps" data-track="hihat">
+                </div>
+            </div>
+            <div class="track">
+                <div class="track-name">Clap</div>
+                <div class="steps" data-track="clap">
+                </div>
+            </div>
         </div>
     </div>
+    <script src="js/script.js" type="text/javascript"></script>
 </body>
 </html>
