@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const config = {
         stepsCount: 16,
-        tracks: ['kick', 'snare', 'hihat', 'clap'],
+        tracks: ['kick', 'snare', 'hihat', 'clap', 'tom', 'cymbal', 'shaker'],
         bpm: {
             min: 60,
             max: 180,
@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
         sequence: {},
         currentStep: 0,
         isPlaying: false,
-        interval: null
+        interval: null,
+        volume: 0.7
     };
 
     const elements = {
@@ -22,11 +23,18 @@ document.addEventListener('DOMContentLoaded', function() {
         playButton: document.getElementById('play'),
         stopButton: document.getElementById('stop'),
         clearButton: document.getElementById('clear'),
-        drumPads: document.querySelectorAll('.drum-pad')
+        drumPads: document.querySelectorAll('.drum-pad'),
+        volumeSlider: document.createElement('input')
     };
+
+    elements.volumeSlider = document.getElementById('volume');
+
 
     const AudioC = window.AudioContext || window.webkitAudioContext;
     const audioC = new AudioC();
+    const masterGain = audioC.createGain();
+    masterGain.gain.value = state.volume;
+    masterGain.connect(audioC.destination);
     
     elements.bpmSlider.min = config.bpm.min;
     elements.bpmSlider.max = config.bpm.max;
@@ -37,21 +45,45 @@ document.addEventListener('DOMContentLoaded', function() {
         kick: Kick(),
         snare: Snare(),
         hihat: HiHat(),
-        clap: Clap()
+        clap: Clap(),
+        tom: Tom(),
+        cymbal: Cymbal(),
+        shaker: Shaker()
     };
 
     config.tracks.forEach(track => {
         state.sequence[track] = Array(config.stepsCount).fill(false);
         const stepsContainer = document.querySelector(`.steps[data-track="${track}"]`);
         
-        for (let i = 0; i < config.stepsCount; i++) {
-            const step = document.createElement('div');
-            step.className = 'step';
-            step.dataset.index = i;
-            step.addEventListener('click', function() {
-                toggleStep(track, i, this);
-            });
-            stepsContainer.appendChild(step);
+        if (!stepsContainer) {
+            const sequencer = document.querySelector('.sequencer');
+            const newTrack = document.createElement('div');
+            newTrack.className = 'track';
+            newTrack.innerHTML = `
+                <div class="track-name">${track}</div>
+                <div class="steps" data-track="${track}"></div>
+            `;
+            sequencer.appendChild(newTrack);
+            
+            for (let i = 0; i < config.stepsCount; i++) {
+                const step = document.createElement('div');
+                step.className = 'step';
+                step.dataset.index = i;
+                step.addEventListener('click', function() {
+                    toggleStep(track, i, this);
+                });
+                newTrack.querySelector('.steps').appendChild(step);
+            }
+        } else {
+            for (let i = 0; i < config.stepsCount; i++) {
+                const step = document.createElement('div');
+                step.className = 'step';
+                step.dataset.index = i;
+                step.addEventListener('click', function() {
+                    toggleStep(track, i, this);
+                });
+                stepsContainer.appendChild(step);
+            }
         }
     });
 
@@ -59,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.playButton.addEventListener('click', startPlayback);
     elements.stopButton.addEventListener('click', stopPlayback);
     elements.clearButton.addEventListener('click', clearSequence);
+    elements.volumeSlider.addEventListener('input', handleVolumeChange);
     
     elements.drumPads.forEach(pad => {
         pad.addEventListener('mousedown', function() {
@@ -83,9 +116,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function handleVolumeChange() {
+        state.volume = parseFloat(this.value);
+        masterGain.gain.value = state.volume;
+    }
+
     function startPlayback() {
         if (!state.isPlaying) {
             state.isPlaying = true;
+            state.currentStep = -1;
             startSequencer();
         }
     }
@@ -153,6 +192,95 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function Tom() {
+        return {
+            start: function() {
+                const now = audioC.currentTime;
+                const osc = audioC.createOscillator();
+                const gain = audioC.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 0.3);
+                
+                gain.gain.setValueAtTime(1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                
+                osc.connect(gain);
+                gain.connect(masterGain);
+                
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+        };
+    }
+
+    function Cymbal() {
+        return {
+            start: function() {
+                const now = audioC.currentTime;
+                const bufferSize = audioC.sampleRate * 0.5;
+                const noiseBuffer = audioC.createBuffer(1, bufferSize, audioC.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+                
+                const noise = audioC.createBufferSource();
+                noise.buffer = noiseBuffer;
+                
+                const filter = audioC.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 5000;
+                
+                const gain = audioC.createGain();
+                gain.gain.setValueAtTime(1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(masterGain);
+                
+                noise.start(now);
+                noise.stop(now + 0.5);
+            }
+        };
+    }
+
+    function Shaker() {
+        return {
+            start: function() {
+                const now = audioC.currentTime;
+                const bufferSize = audioC.sampleRate * 0.3;
+                const noiseBuffer = audioC.createBuffer(1, bufferSize, audioC.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+                
+                const noise = audioC.createBufferSource();
+                noise.buffer = noiseBuffer;
+                
+                const filter = audioC.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 2000;
+                
+                const gain = audioC.createGain();
+                gain.gain.setValueAtTime(0.8, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(masterGain);
+                
+                noise.start(now);
+                noise.stop(now + 0.3);
+            }
+        };
+    }
+
     function Kick() {
         return {
             start: function() {
@@ -173,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 osc.connect(gain);
                 osc2.connect(gain);
-                gain.connect(audioC.destination);
+                gain.connect(masterGain);
                 
                 osc.start(now);
                 osc2.start(now);
@@ -216,10 +344,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 noise.connect(noiseFilter);
                 noiseFilter.connect(noiseEnvelope);
-                noiseEnvelope.connect(audioC.destination);
+                noiseEnvelope.connect(masterGain);
                 
                 osc.connect(oscEnvelope);
-                oscEnvelope.connect(audioC.destination);
+                oscEnvelope.connect(masterGain);
                 
                 noise.start(now);
                 osc.start(now);
@@ -258,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 noise.connect(bandpass);
                 bandpass.connect(highpass);
                 highpass.connect(gain);
-                gain.connect(audioC.destination);
+                gain.connect(masterGain);
                 
                 noise.start(now);
                 noise.stop(now + 0.1);
@@ -299,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 noise.connect(filter);
                 filter.connect(gain);
-                gain.connect(audioC.destination);
+                gain.connect(masterGain);
                 
                 noise.start(now);
                 noise.stop(now + 0.2);

@@ -143,3 +143,31 @@ button:hover {
 .step.current {
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
+
+#volume {
+    width: 100px;
+    margin-left: 10px;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.drum-pads {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.drum-pad {
+    width: 100%;
+    height: 60px;
+}
+
+.sequencer {
+    max-height: 300px;
+    overflow-y: auto;
+}

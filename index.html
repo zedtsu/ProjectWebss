@@ -17,6 +17,10 @@
                     <input type="range" id="bpm" min="60" max="180" value="130">
                     <span id="bpmValue">130</span>
                 </div>
+                <div class="volume-control">
+                    <label for="volume">Громкость:</label>
+                    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.7">
+                </div>
                 <div class="buttons">
                     <button class="play-button" id="play">Играть</button>
                     <button class="stop-button" id="stop">Остановить</button>
@@ -30,28 +34,39 @@
             <div class="drum-pad" data-sound="snare">Snare</div>
             <div class="drum-pad" data-sound="hihat">Hi-Hat</div>
             <div class="drum-pad" data-sound="clap">Clap</div>
+            <div class="drum-pad" data-sound="tom">Tom</div>
+            <div class="drum-pad" data-sound="cymbal">Cymbal</div>
+            <div class="drum-pad" data-sound="shaker">Shaker</div>
         </div>
         
         <div class="sequencer">
             <div class="track">
                 <div class="track-name">Kick</div>
-                <div class="steps" data-track="kick">
-                </div>
+                <div class="steps" data-track="kick"></div>
             </div>
             <div class="track">
                 <div class="track-name">Snare</div>
-                <div class="steps" data-track="snare">
-                </div>
+                <div class="steps" data-track="snare"></div>
             </div>
             <div class="track">
                 <div class="track-name">Hi-Hat</div>
-                <div class="steps" data-track="hihat">
-                </div>
+                <div class="steps" data-track="hihat"></div>
             </div>
             <div class="track">
                 <div class="track-name">Clap</div>
-                <div class="steps" data-track="clap">
-                </div>
+                <div class="steps" data-track="clap"></div>
+            </div>
+            <div class="track">
+                <div class="track-name">Tom</div>
+                <div class="steps" data-track="tom"></div>
+            </div>
+            <div class="track">
+                <div class="track-name">Cymbal</div>
+                <div class="steps" data-track="cymbal"></div>
+            </div>
+            <div class="track">
+                <div class="track-name">Shaker</div>
+                <div class="steps" data-track="shaker"></div>
             </div>
         </div>
     </div>
