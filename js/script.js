@@ -24,11 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
         stopButton: document.getElementById('stop'),
         clearButton: document.getElementById('clear'),
         drumPads: document.querySelectorAll('.drum-pad'),
+        saveButton: document.getElementById('save'),
         volumeSlider: document.createElement('input')
     };
+    
 
     elements.volumeSlider = document.getElementById('volume');
 
+    let audioRecorder = {
+        audioContext: null,
+        recorder: null,
+        audioBuffers: [],
+        isRecording: false,
+        startTime: 0,
+        recordingLength: 0
+    };
 
     const AudioC = window.AudioContext || window.webkitAudioContext;
     const audioC = new AudioC();
@@ -86,12 +96,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-
+    
     elements.bpmSlider.addEventListener('input', handleBpmChange);
     elements.playButton.addEventListener('click', startPlayback);
     elements.stopButton.addEventListener('click', stopPlayback);
     elements.clearButton.addEventListener('click', clearSequence);
     elements.volumeSlider.addEventListener('input', handleVolumeChange);
+    elements.saveButton.addEventListener('click', saveAsMP3);
+
     
     elements.drumPads.forEach(pad => {
         pad.addEventListener('mousedown', function() {
@@ -296,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 osc2.type = 'sine';
                 osc2.frequency.setValueAtTime(50, now);
                 
-                gain.gain.setValueAtTime(1, now);
+                gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                 
                 osc.connect(gain);
@@ -433,5 +445,108 @@ document.addEventListener('DOMContentLoaded', function() {
                 noise.stop(now + 0.2);
             }
         };
+    }
+
+    function startRecording() {
+        audioRecorder.audioBuffers = [];
+        audioRecorder.isRecording = true;
+        audioRecorder.startTime = audioC.currentTime;
+        audioRecorder.recordingLength = 0;
+    
+    const recordNode = audioC.createScriptProcessor(4096, 1, 1);
+    recordNode.onaudioprocess = function(e) {
+            if (!audioRecorder.isRecording){
+                return;
+            }
+        
+            const channelData = e.inputBuffer.getChannelData(0);
+            const buffer = new Float32Array(channelData.length);
+            for (let i = 0; i < channelData.length; i++) {
+                buffer[i] = channelData[i];
+            }
+            audioRecorder.audioBuffers.push(buffer);
+            audioRecorder.recordingLength += buffer.length;
+        };
+    
+        masterGain.connect(recordNode);
+        recordNode.connect(audioC.destination);
+        audioRecorder.recorder = recordNode;
+    }
+
+    function stopRecording() {
+        audioRecorder.isRecording = false;
+        if (audioRecorder.recorder) {
+            audioRecorder.recorder.disconnect();
+        }
+    }
+
+    function saveAsMP3() {
+        if (state.isPlaying) {
+        stopPlayback();
+        }
+    
+        startRecording();
+        startPlayback();
+    
+        setTimeout(() => {
+            stopPlayback();
+            setTimeout(() => {
+                stopRecording();
+                exportMP3();
+            }, 100);
+        }, calculateRecordingTime());
+    }
+
+    function calculateRecordingTime() {
+        const bpm = parseInt(elements.bpmSlider.value);
+        const stepDuration = 60000 / bpm / 4;
+        return config.stepsCount * stepDuration;
+    }
+
+    function exportMP3() {
+        const sampleRate = audioC.sampleRate;
+        const mergedBuffer = mergeBuffers(audioRecorder.audioBuffers, audioRecorder.recordingLength);
+        const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, 48000);
+        const samples = new Int16Array(mergedBuffer.length);
+    
+        for (let i = 0; i < mergedBuffer.length; i++) {
+        samples[i] = mergedBuffer[i] * 32767;
+        }
+    
+        const blockSize = 1152;
+        const mp3Data = [];
+    
+        for (let i = 0; i < samples.length; i += blockSize) {
+            const chunk = samples.subarray(i, i + blockSize);
+            const mp3buf = mp3encoder.encodeBuffer(chunk);
+            if (mp3buf.length > 0) {
+                mp3Data.push(mp3buf);
+            }
+        }
+
+        const mp3buf = mp3encoder.flush();
+        if (mp3buf.length > 0) {
+            mp3Data.push(mp3buf);
+        }
+    
+        const blob = new Blob(mp3Data, { type: 'audio/mp3' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'drumpad-beat.mp3';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function mergeBuffers(buffers, length) {
+        const result = new Float32Array(length);
+        let offset = 0;
+    
+        for (let i = 0; i < buffers.length; i++) {
+            result.set(buffers[i], offset);
+            offset += buffers[i].length;
+        }
+
+        return result;
     }
 });

@@ -15,7 +15,7 @@ body {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    width: 800px;
+    width: 900px;
 }
 
 h1 {
@@ -64,6 +64,11 @@ button {
 
 #clear {
     background-color: #ff9800;
+    color: white;
+}
+
+#save {
+    background-color: #2196F3;
     color: white;
 }
 
