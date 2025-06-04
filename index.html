@@ -9,7 +9,8 @@
     <title>Drumpad online</title>
 </head>
 <body>
-    <div class="drum-machine">
+    <div class="wrapper">
+        <div class="drum-machine">
         <h1>Drumpad online</h1>
         <div class="controls">
             <div class="control-row">
@@ -25,8 +26,10 @@
                 <div class="buttons">
                     <button class="play-button" id="play">Играть</button>
                     <button class="stop-button" id="stop">Остановить</button>
+                    <button id="record">Запись</button>
                     <button id="save">Сохранить</button>
                     <button id="clear">Очистить</button>
+                    <button id="theme-toggle">Тема</button>
                 </div>
             </div>
         </div>
@@ -72,6 +75,12 @@
             </div>
         </div>
     </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Drumpad Online - создавайте биты прямо в браузере</p>
+        </div>
+    </footer>   
+
     <script src="js/script.js" type="text/javascript"></script>
 </body>
 </html>

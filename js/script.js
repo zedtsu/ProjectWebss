@@ -7,7 +7,28 @@ document.addEventListener('DOMContentLoaded', function() {
             max: 180,
             default: 130
         }
-    };
+    }; 
+
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', function() {
+        document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', document.body.dataset.theme);
+    });
+
+    const loader = document.createElement('div');
+    loader.id = 'loader';
+    loader.innerHTML = `
+        <div class="loader-content">
+            <img src="data/icon.png" alt="Loading" class="loader-image">
+            <div class="loader-text">Загрузка Drumpad...</div>
+        </div>
+    `;
+    document.body.appendChild(loader);
+
+    setTimeout(() => {
+        loader.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 2000);
 
     const state = {
         sequence: {},
@@ -25,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
         clearButton: document.getElementById('clear'),
         drumPads: document.querySelectorAll('.drum-pad'),
         saveButton: document.getElementById('save'),
-        volumeSlider: document.createElement('input')
+        volumeSlider: document.createElement('input'),
+        recordButton: document.getElementById('record')
     };
     
 
@@ -37,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
         audioBuffers: [],
         isRecording: false,
         startTime: 0,
-        recordingLength: 0
+        recordingLength: 0,
+        recordNode: null
     };
 
     const AudioC = window.AudioContext || window.webkitAudioContext;
@@ -102,7 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.stopButton.addEventListener('click', stopPlayback);
     elements.clearButton.addEventListener('click', clearSequence);
     elements.volumeSlider.addEventListener('input', handleVolumeChange);
-    elements.saveButton.addEventListener('click', saveAsMP3);
+    elements.saveButton.addEventListener('click', exportMP3);
+    elements.recordButton.addEventListener('click', toggleRecording);
+    
 
     
     elements.drumPads.forEach(pad => {
@@ -145,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
         state.isPlaying = false;
         clearInterval(state.interval);
         resetCurrentStep();
-        state.currentStep = 0;
     }
 
     function clearSequence() {
@@ -215,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 osc.frequency.setValueAtTime(200, now);
                 osc.frequency.exponentialRampToValueAtTime(80, now + 0.3);
                 
-                gain.gain.setValueAtTime(1, now);
+                gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
                 
                 osc.connect(gain);
@@ -247,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 filter.frequency.value = 5000;
                 
                 const gain = audioC.createGain();
-                gain.gain.setValueAtTime(1, now);
+                gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                 
                 noise.connect(filter);
@@ -343,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 noiseFilter.frequency.value = 1000;
                 
                 const noiseEnvelope = audioC.createGain();
-                noiseEnvelope.gain.setValueAtTime(1, now);
+                noiseEnvelope.gain.setValueAtTime(0.3, now);
                 noiseEnvelope.gain.exponentialRampToValueAtTime(0.01, now + noiseDuration);
                 
                 const osc = audioC.createOscillator();
@@ -382,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 highpass.type = 'highpass';
                 highpass.frequency.value = 7000;
                 
-                gain.gain.setValueAtTime(1, now);
+                gain.gain.setValueAtTime(0.5, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
                 
                 const bufferSize = audioC.sampleRate * 0.1;
@@ -432,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const peakTimes = [0, 0.02, 0.04];
                 
                 for (let i = 0; i < peaks; i++) {
-                    gain.gain.setValueAtTime(1, now + peakTimes[i]);
+                    gain.gain.setValueAtTime(0.3, now + peakTimes[i]);
                     gain.gain.exponentialRampToValueAtTime(0.1, now + peakTimes[i] + 0.05);
                 }
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
@@ -445,6 +469,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 noise.stop(now + 0.2);
             }
         };
+    }
+
+    function toggleRecording() {
+        if (audioRecorder.isRecording) {
+            stopRecording();
+            stopPlayback();
+            elements.recordButton.textContent = 'Запись';
+            elements.recordButton.style.backgroundColor = '';
+        } else {
+            startRecording();
+            startPlayback();
+            elements.recordButton.textContent = 'Стоп';
+            elements.recordButton.style.backgroundColor = '#ff0000';
+    }
+    }
+
+    function startRecording() {
+        audioRecorder.audioBuffers = [];
+        audioRecorder.isRecording = true;
+        audioRecorder.startTime = audioC.currentTime;
+        audioRecorder.recordingLength = 0;
+
+        audioRecorder.recordNode = audioC.createScriptProcessor(4096, 1, 1);
+        audioRecorder.recordNode.onaudioprocess = function(e) {
+            if (!audioRecorder.isRecording) return;
+
+            const channelData = e.inputBuffer.getChannelData(0);
+            const buffer = new Float32Array(channelData.length);
+            for (let i = 0; i < channelData.length; i++) {
+                buffer[i] = channelData[i];
+            }
+            audioRecorder.audioBuffers.push(buffer);
+            audioRecorder.recordingLength += buffer.length;
+        };
+
+        masterGain.connect(audioRecorder.recordNode);
+        audioRecorder.recordNode.connect(audioC.destination);
+    }
+
+    function stopRecording() {
+        audioRecorder.isRecording = false;
+        if (audioRecorder.recordNode) {
+            audioRecorder.recordNode.disconnect();
+        }
+        exportMP3();
     }
 
     function startRecording() {
@@ -480,29 +549,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function saveAsMP3() {
-        if (state.isPlaying) {
-        stopPlayback();
-        }
-    
-        startRecording();
-        startPlayback();
-    
-        setTimeout(() => {
-            stopPlayback();
-            setTimeout(() => {
-                stopRecording();
-                exportMP3();
-            }, 100);
-        }, calculateRecordingTime());
-    }
-
-    function calculateRecordingTime() {
-        const bpm = parseInt(elements.bpmSlider.value);
-        const stepDuration = 60000 / bpm / 4;
-        return config.stepsCount * stepDuration;
-    }
-
     function exportMP3() {
         const sampleRate = audioC.sampleRate;
         const mergedBuffer = mergeBuffers(audioRecorder.audioBuffers, audioRecorder.recordingLength);
@@ -536,6 +582,18 @@ document.addEventListener('DOMContentLoaded', function() {
         a.download = 'drumpad-beat.mp3';
         a.click();
         URL.revokeObjectURL(url);
+    }
+
+    function mergeBuffers(buffers, length) {
+        const result = new Float32Array(length);
+        let offset = 0;
+    
+        for (let i = 0; i < buffers.length; i++) {
+            result.set(buffers[i], offset);
+            offset += buffers[i].length;
+        }
+
+        return result;
     }
 
     function mergeBuffers(buffers, length) {

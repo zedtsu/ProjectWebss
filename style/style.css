@@ -1,178 +1,317 @@
+:root {
+  --bg-color: rgb(14, 12, 34);
+  --text-color: white;
+  --pad-color: rgb(50, 50, 80);
+  --pad-hover: rgb(70, 70, 110);
+  --pad-active: rgb(100, 150, 255);
+  --control-bg: rgb(37, 43, 88);
+  --step-color: rgb(50, 50, 80);
+  --step-active: rgb(100, 150, 255);
+}
+
+[data-theme="light"] {
+  --bg-color: #504b99;
+  --text-color: #ffffff;
+  --pad-color: #715dbc;
+  --pad-hover: #cccccc;
+  --pad-active: #7ab3ff;
+  --control-bg: #7183b4;
+  --step-color: #2c1c55;
+  --step-active: #7ab3ff;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: rgb(37, 43, 88);
-    color: white;
+  font-family: 'Arial', sans-serif;
+    background-color: var(--control-bg);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    padding: 20px;
+    z-index: 9999;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-image {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.loader-text {
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .drum-machine {
-    background-color: rgb(14, 12, 34);
-    border-radius: 10px;
+    background-color: var(--bg-color);
+    border-radius: 10px 10px 0 0;
     padding: 20px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    width: 900px;
+    width: 100%;
+    transition: all 0.3s ease;
 }
 
 h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: rgb(255, 255, 255);
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text-color);
 }
 
 .controls {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .control-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
-.bpm-control {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.bpm-control, .volume-control, .buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
 }
 
 .play-button {
-    background-color: #4CAF50;
-    color: white;
+  background-color: #3832e1;
+  color: white;
 }
 
 .stop-button {
-    background-color: #f44336;
-    color: white;
+  background-color: #ff6f00;
+  color: white;
 }
 
 #clear {
-    background-color: #ff9800;
-    color: white;
+  background-color: #ff9800;
+  color: white;
 }
 
 #save {
-    background-color: #2196F3;
-    color: white;
+  background-color: #43d948;
+  color: white;
+}
+
+#theme-toggle {
+  background-color: #945a9f;
+  color: white;
 }
 
 button:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+#record {
+    background-color: #ff0000;
+    color: white;
+}
+
+#record:hover {
     opacity: 0.8;
     transform: scale(1.05);
 }
 
 .drum-pads {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .drum-pad {
-    width: 80px;
-    height: 80px;
-    background-color: rgb(50, 50, 80);
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.1s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    user-select: none;
+  background-color: var(--pad-color);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  user-select: none;
+  aspect-ratio: 1;
+  min-height: 6px;
+  height: 7vh;
+  width: 110px;
 }
 
 .drum-pad:hover {
-    background-color: rgb(70, 70, 110);
+  background-color: var(--pad-hover);
 }
 
 .drum-pad.active {
-    background-color: rgb(100, 150, 255);
-    transform: scale(0.95);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-color: var(--pad-active);
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .sequencer {
-    margin-top: 20px;
+  margin-top: 20px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .track {
-    display: flex;
-    margin-bottom: 10px;
-    align-items: center;
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
 }
 
 .track-name {
-    width: 80px;
-    text-align: center;
+  width: 80px;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 .steps {
-    display: flex;
-    flex-grow: 1;
-    gap: 5px;
+  display: flex;
+  flex-grow: 1;
+  gap: 5px;
+  overflow-x: auto;
+  padding-bottom: 5px;
 }
 
 .step {
-    width: 30px;
-    height: 30px;
-    background-color: rgb(50, 50, 80);
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.1s;
+  min-width: 30px;
+  height: 30px;
+  background-color: var(--step-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.1s;
+  flex-shrink: 0;
 }
 
 .step:hover {
-        background-color: rgb(70, 70, 110);
+  background-color: var(--pad-hover);
 }
 
 .step.active {
-    background-color: rgb(100, 150, 255);
+  background-color: var(--step-active);
 }
 
 .step.current {
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 #volume {
-    width: 100px;
-    margin-left: 10px;
+  width: 100px;
 }
 
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.drum-pads {
+@media (max-width: 768px) {
+  .drum-machine {
+    padding: 15px;
+    width: 95%;
+  }
+  
+  .control-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .bpm-control, .volume-control {
+    justify-content: space-between;
+  }
+  
+  .buttons {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    margin-bottom: 20px;
-}
-
-.drum-pad {
+  }
+  
+  .track {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .track-name {
     width: 100%;
-    height: 60px;
+    text-align: left;
+    margin-bottom: 5px;
+  }
+  
+  .steps {
+    width: 100%;
+  }
 }
 
-.sequencer {
-    max-height: 300px;
-    overflow-y: auto;
+@media (max-width: 480px) {
+  .drum-pads {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .step {
+    min-width: 25px;
+    height: 25px;
+  }
+}
+
+.footer {
+    width: 105%;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 15px 0;
+    margin-top: auto;
+    border-radius: 0 0 10px 10px;
+}
+
+.footer-content {
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.footer p {
+    margin: 5px 0;
+    line-height: 1.4;
 }
