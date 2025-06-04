@@ -558,10 +558,16 @@ document.addEventListener('DOMContentLoaded', function() {
         audioRecorder.isRecording = false;
         if (audioRecorder.recorder) {
             audioRecorder.recorder.disconnect();
+        } if (audioRecorder.audioBuffers && audioRecorder.audioBuffers.length > 0) {
+            exportMP3();
         }
     }
 
     function exportMP3() {
+        if (!audioRecorder.audioBuffers || audioRecorder.audioBuffers.length === 0) {
+            return;
+        }
+
         const sampleRate = audioC.sampleRate;
         const mergedBuffer = mergeBuffers(audioRecorder.audioBuffers, audioRecorder.recordingLength);
         const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, 48000);
