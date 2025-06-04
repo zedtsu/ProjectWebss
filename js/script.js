@@ -114,6 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const step = document.createElement('div');
                 step.className = 'step';
                 step.dataset.index = i;
+                
+                if ((i + 1) % 4 === 0 && i !== config.stepsCount - 1) {
+                    step.classList.add('bar-marker');
+                }
+                
                 step.addEventListener('click', function() {
                     toggleStep(track, i, this);
                 });
@@ -124,6 +129,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const step = document.createElement('div');
                 step.className = 'step';
                 step.dataset.index = i;
+                
+                if ((i + 1) % 4 === 0 && i !== config.stepsCount - 1) {
+                    step.classList.add('bar-marker');
+                }
+                
                 step.addEventListener('click', function() {
                     toggleStep(track, i, this);
                 });

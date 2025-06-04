@@ -247,6 +247,25 @@ button:hover {
   width: 100px;
 }
 
+.step.bar-marker {
+    position: relative;
+}
+
+.step.bar-marker::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.567);
+}
+
+.step.bar-marker.active::after,
+.step.bar-marker.current::after {
+    background-color: rgb(255, 255, 255);
+}
+
 @media (max-width: 768px) {
   .drum-machine {
     padding: 15px;
@@ -373,6 +392,25 @@ button:hover {
     .step {
         min-width: 20px;
         height: 20px;
+    }
+
+    .step.bar-marker {
+        position: relative;
+    }
+
+    .step.bar-marker::after {
+        content: '';
+        position: absolute;
+        right: -3px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: rgba(255, 255, 255, 0.519);
+    }
+
+    .step.bar-marker.active::after,
+    .step.bar-marker.current::after {
+        background-color: rgb(255, 255, 255);
     }
 
     .footer {
