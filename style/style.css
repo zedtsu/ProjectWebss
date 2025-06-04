@@ -295,6 +295,130 @@ button:hover {
   }
 }
 
+@media (max-width: 600px) {
+    .wrapper {
+        padding: 10px;
+        width: 100%;
+    }
+
+    .drum-machine {
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .control-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .bpm-control, .volume-control {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #bpm, #volume {
+        flex-grow: 1;
+        max-width: 60%;
+    }
+
+    .buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width: 100%;
+    }
+
+    .buttons button {
+        padding: 8px 5px;
+        font-size: 0.8rem;
+    }
+
+    .drum-pads {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .drum-pad {
+        width: 100%;
+        height: 60px;
+        font-size: 0.9rem;
+    }
+
+    .sequencer {
+        max-height: 300px;
+    }
+
+    .track {
+        flex-direction: column;
+        margin-bottom: 8px;
+    }
+
+    .track-name {
+        width: 100%;
+        text-align: left;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+
+    .steps {
+        width: 100%;
+        gap: 3px;
+    }
+
+    .step {
+        min-width: 20px;
+        height: 20px;
+    }
+
+    .footer {
+        width: 100%;
+        padding: 10px 0;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .footer-content p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .drum-pads {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #bpm, #volume {
+        max-width: 55%;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .drum-machine {
+        padding: 10px;
+    }
+
+    .drum-pads {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .sequencer {
+        max-height: 150px;
+    }
+
+    .step {
+        min-width: 15px;
+        height: 15px;
+    }
+}
+
 .footer {
     width: 105%;
     background-color: var(--bg-color);

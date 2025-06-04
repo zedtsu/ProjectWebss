@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', function() {
         volume: 0.7
     };
 
+    function handleResize() {
+        const html = document.documentElement;
+        if (window.innerWidth < 600) {
+            html.style.fontSize = '14px';
+        } else {
+            html.style.fontSize = '16px';
+        }
+    }
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
     const elements = {
         bpmSlider: document.getElementById('bpm'),
         bpmValue: document.getElementById('bpmValue'),
